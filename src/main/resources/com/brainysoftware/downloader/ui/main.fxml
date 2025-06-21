@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import java.lang.*?>
+<?import javafx.scene.*?> 
+<?import javafx.scene.control.*?> 
+<?import javafx.scene.layout.*?> 
+<?import javafx.geometry.Insets?> 
+<?import javafx.scene.image.Image?> 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.collections.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+        fx:controller="com.brainysoftware.downloader.ui.MainController"
+        prefWidth="1000" prefHeight="600"
+        onKeyPressed="#handleKeyInput">
+    <top>
+        <VBox>
+            <fx:include fx:id="menuBar" source="menu.fxml"/>
+<!--
+            <fx:include fx:id="toolBar" source="toolbar.fxml"/>
+-->
+        </VBox>
+    </top>
+    <center>
+    </center> 
+</BorderPane>
