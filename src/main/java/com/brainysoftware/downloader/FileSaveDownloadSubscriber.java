@@ -2,9 +2,15 @@ package com.brainysoftware.downloader;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -17,12 +23,14 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
 
     private Flow.Subscription subscription;
     private OutputStream outputStream;
+    private long contentLength;
     private long bytesDownloaded = 0;
+    private LocalDateTime startTime;
     
-    private static int no = 2;
-
-    public FileSaveDownloadSubscriber(Path outputPath) {
+    public FileSaveDownloadSubscriber(Path outputPath, long contentLength) {
+        this.startTime = LocalDateTime.now();
         this.outputPath = outputPath;
+        this.contentLength = contentLength;
         try {
             this.outputStream = Files.newOutputStream(outputPath,
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
@@ -38,14 +46,13 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
-        System.out.println("onSubscribe");
         this.subscription = subscription;
+        
         subscription.request(1); // request first chunk
     }
 
     @Override
     public void onNext(List<ByteBuffer> items) {
-        System.out.println("onNext----- items.size:" + items.size());
         try {
             for (ByteBuffer buffer : items) {
                 int len = buffer.remaining();
@@ -54,8 +61,6 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
                 buffer.get(data);
                 outputStream.write(data);
             }
-            System.out.println("request again:" + no);
-            //subscription.request(no++); // request next chunk
             subscription.request(1); // request next chunk
         } catch (IOException e) {
             onError(e);
@@ -64,25 +69,26 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
 
     @Override
     public void onError(Throwable throwable) {
-        System.out.println("onError");
         try {
             outputStream.close();
         } catch (IOException ignored) {
             ignored.printStackTrace();
-            
         }
         result.completeExceptionally(throwable);
     }
 
     @Override
     public void onComplete() {
-        System.out.println("onComplete");
         try {
             outputStream.close();
             result.complete(outputPath);
         } catch (IOException e) {
             onError(e);
         }
+        LocalDateTime finishTime = LocalDateTime.now();
+        System.out.println("download of " + this.outputPath.toString());
+        System.out.println("start " + startTime);
+        System.out.println("finish " + finishTime);
     }
-
+    
 }
