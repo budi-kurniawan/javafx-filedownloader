@@ -3,7 +3,7 @@ package com.brainysoftware.downloader.ui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.brainysoftware.downloader.ui.event.EventManager;
+import com.brainysoftware.downloader.event.EventManager;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

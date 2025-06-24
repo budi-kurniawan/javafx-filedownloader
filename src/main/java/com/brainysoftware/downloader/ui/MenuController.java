@@ -1,6 +1,12 @@
 package com.brainysoftware.downloader.ui;
 
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.brainysoftware.downloader.DownloadRequest;
+import com.brainysoftware.downloader.Downloader;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,33 +40,36 @@ public class MenuController implements Initializable {
 
 	@FXML
     private void handleDownload(final ActionEvent event) {
-        String[] urls = {"", ""};
-        DownloadStatusDialog dialog = new DownloadStatusDialog(urls);
-        dialog.showAndWait().ifPresent(result -> {
-            // change view and DocumentNote of current page
-//            float degrees = result.degrees();
-//            int pageNo = GUIManager.currentPageNo;
-//            EventManager.getInstance().firePageRotatedEvent(
-//                    new PageRotatedEvent(event.getSource(), 
-//                            GUIManager.currentPageNo, degrees));
-//            PDFHandler pdfHandler = GUIManager.getInstance().getCurrentPDFHandler();
-//            String scope = result.scope().toLowerCase();
-//            if (scope.startsWith("all")) {
-//                int numPages = pdfHandler.getNumPages();
-//                for (int i = 0; i < numPages; i++) {
-//                    PageNote pageNote = pdfHandler.getPageNote(i);
-//                    pageNote.setRotated(degrees);
-//                    pageNote.getThumbnailView().setRotate(degrees);
-//                }
-//            } else {
-//                PageNote pageNote = pdfHandler.getPageNote(pageNo);
-//                pageNote.setRotated(degrees);
-//                pageNote.getThumbnailView().setRotate(degrees);
-//            }
-//            // update display of current page
-//            EventManager.getInstance().firePageSelectedEvent(
-//                    new PageSelectedEvent(event.getSource(), pageNo));
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        DownloadProgressDialog dialog = new DownloadProgressDialog("Download Progress",
+                "Please wait");
+        List<DownloadRequest> downloadRequests = List.of(
+                new DownloadRequest(
+//                        "https://theage.com.au",
+                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
+                        Paths.get("D://downloads/encoder_model.onnx"),
+                        cancelled,
+                        new UIDownloadListener(dialog))
+//                ,
+//                new DownloadRequest(
+//                        "https://cnn.com",
+////                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
+//                        Paths.get("D://downloads/decoder_model.onnx"),
+//                        cancelled,
+//                        null)
+                );
+        dialog.setOnCancel(() -> {
+            System.out.println("cancelled by clicking Cancel");
+            dialog.close();
+            cancelled.set(true);
         });
+        dialog.show();
+        long t1 = System.currentTimeMillis();
+        Downloader downloader = new Downloader();
+        downloader.download(downloadRequests);
+        long t2 = System.currentTimeMillis();
+        System.out.println("time taken:" + (t2 - t1));
+
 
     }
 

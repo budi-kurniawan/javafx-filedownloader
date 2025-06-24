@@ -1,4 +1,4 @@
-package com.brainysoftware.downloader.ui.event;
+package com.brainysoftware.downloader.event;
 
 /**
  * 

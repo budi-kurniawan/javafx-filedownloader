@@ -15,20 +15,19 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.brainysoftware.downloader.listener.SimpleDownloadListener;
+
 public class Downloader {
-    public void download(List<DownloadSourceDestination> downloadSourcesDestinations) {
+    public void download(List<DownloadRequest> downloadRequests) {
         HttpClient client = HttpClient.newBuilder()
                 .followRedirects(Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
-        long t1 = System.currentTimeMillis();
-        AtomicBoolean cancelled = new AtomicBoolean(false);
         List<CompletableFuture<HttpResponse<Path>>> futures = new ArrayList<>();
-        for (DownloadSourceDestination sourceDestination: downloadSourcesDestinations) {
-            URI uri = URI.create(sourceDestination.uri());
-            Path savePath = sourceDestination.savePath();
+        for (DownloadRequest downloadRequest: downloadRequests) {
+            URI uri = URI.create(downloadRequest.uri());
             HttpRequest request = HttpRequest.newBuilder(uri).build();
-            CompletableFuture<HttpResponse<Path>> response = client.sendAsync(request,
+            CompletableFuture<HttpResponse<Path>> future = client.sendAsync(request,
                     responseInfo -> {
                         HttpHeaders headers = responseInfo.headers();
                         // try to get Content-Length from header
@@ -41,14 +40,11 @@ public class Downloader {
                                 e.printStackTrace();
                             }
                         }
-                        return new FileSaveDownloadSubscriber(savePath, contentLength,
-                            cancelled);
+                        return new FileSaveDownloadSubscriber(contentLength, downloadRequest);
                     });
-            futures.add(response);
+            futures.add(future);
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        long t2 = System.currentTimeMillis();
-        System.out.println("time taken:" + (t2 - t1));
+        //CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
     
     private static long getContentLength(HttpClient client, URI uri) throws IOException, InterruptedException {
@@ -62,18 +58,27 @@ public class Downloader {
 
 
     public static void main(String[] args) {
-        List<DownloadSourceDestination> list = List.of(
-                new DownloadSourceDestination(
-//                        "https://florentineeyewear.com.au/",
-                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
-                        Paths.get("D://downloads/encoder_model.onnx"))
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        List<DownloadRequest> downloadRequests = List.of(
+                new DownloadRequest(
+                        "https://theage.com.au",
+//                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
+                        Paths.get("D://downloads/encoder_model.onnx"),
+                        cancelled,
+                        new SimpleDownloadListener())
                 ,
-                new DownloadSourceDestination(
-//                        "https://florentineeyewear.com.au/",
-                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
-                        Paths.get("D://downloads/decoder_model.onnx"))
+                new DownloadRequest(
+                        "https://cnn.com",
+//                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
+                        Paths.get("D://downloads/decoder_model.onnx"),
+                        cancelled,
+                        null)
                 );
+        long t1 = System.currentTimeMillis();
         Downloader downloader = new Downloader();
-        downloader.download(list);
+        downloader.download(downloadRequests);
+        long t2 = System.currentTimeMillis();
+        System.out.println("time taken:" + (t2 - t1));
+
     }
 }

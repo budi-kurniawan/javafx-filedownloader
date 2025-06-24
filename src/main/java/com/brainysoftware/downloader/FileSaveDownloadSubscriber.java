@@ -14,6 +14,9 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.brainysoftware.downloader.event.DownloadProgressEvent;
+import com.brainysoftware.downloader.listener.DownloadListener;
+
 public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<Path> {
 
     private final CompletableFuture<Path> result = new CompletableFuture<>();
@@ -25,18 +28,20 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
     private long contentLength;
     private long bytesDownloaded = 0;
     private LocalDateTime startTime;
+    private DownloadListener downloadListener;
     
-    public FileSaveDownloadSubscriber(Path outputPath, long contentLength, AtomicBoolean cancelled) {
+    public FileSaveDownloadSubscriber(long contentLength, DownloadRequest downloadRequest) {
         this.startTime = LocalDateTime.now();
-        this.outputPath = outputPath;
         this.contentLength = contentLength;
+        this.outputPath = downloadRequest.savePath();
+        this.downloadListener = downloadRequest.listener();
+        this.cancelled = downloadRequest.cancelled();
         try {
             this.fileChannel = FileChannel.open(outputPath,
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
         } catch (IOException e) {
             throw new RuntimeException("Failed to open file for writing", e);
         }
-        this.cancelled = cancelled;
     }
 
     @Override
@@ -66,9 +71,13 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
             for (ByteBuffer buffer : items) {
                 int len = buffer.remaining();
                 bytesDownloaded += len;
-//                byte[] data = new byte[len];
-//                buffer.get(data);
                 fileChannel.write(buffer);
+            }
+            if (downloadListener != null) {
+                System.out.println("inside subscriber. bytesDl:" + bytesDownloaded + 
+                        ", cL:" + contentLength);
+                DownloadProgressEvent event = new DownloadProgressEvent(this, bytesDownloaded, contentLength);
+                downloadListener.onProgress(event);
             }
             subscription.request(1); // request next chunk
         } catch (IOException e) {

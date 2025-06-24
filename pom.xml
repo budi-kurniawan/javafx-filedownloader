@@ -18,7 +18,7 @@
 		<gluonfx.plugin.version>1.0.22</gluonfx.plugin.version>
 		<charm.version>6.2.3</charm.version>
 		<attach.version>4.0.19</attach.version>
-		<main.class>com.brainysoftware.downloader.ui.Downloader</main.class>
+		<main.class>com.brainysoftware.downloader.ui.Main</main.class>
 	</properties>
 
 	<dependencies>
@@ -92,12 +92,6 @@
 				<version>${javafx.plugin.version}</version>
 				<configuration>
 					<mainClass>${main.class}</mainClass>
-					<!-- this affects both javafx and gluonfx plug-ins -->
-					<commandlineArgs>
-						C:\Users\budi2020\Downloads\with-gorilla.pdf</commandlineArgs>
-					<!-- mvn gluonfx:run -Dopen_file=C:\my.pdf
-					  -->
-					<commandlineArgs>${open_file}</commandlineArgs>
 				</configuration>
 			</plugin>
 			<plugin>
