@@ -1,4 +1,4 @@
-package com.brainysoftware.downloader;
+package com.brainysoftware.downloader.ui.listener;
 
 import java.nio.file.Path;
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
@@ -12,10 +13,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Downloader {
     public void download(List<DownloadSourceDestination> downloadSourcesDestinations) {
@@ -24,29 +22,31 @@ public class Downloader {
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         long t1 = System.currentTimeMillis();
-        ExecutorService executor = Executors.newFixedThreadPool(downloadSourcesDestinations.size());
-        List<CompletableFuture<HttpResponse<Path>>> responses = new ArrayList<>();
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        List<CompletableFuture<HttpResponse<Path>>> futures = new ArrayList<>();
         for (DownloadSourceDestination sourceDestination: downloadSourcesDestinations) {
             URI uri = URI.create(sourceDestination.uri());
             Path savePath = sourceDestination.savePath();
-            try {
-                long contentLength = getContentLength(client, uri);
-                HttpRequest request = HttpRequest.newBuilder(uri).build();
-                CompletableFuture<HttpResponse<Path>> response = client.sendAsync(request,
-                        responseInfo -> new FileSaveDownloadSubscriber(savePath, contentLength));
-                executor.submit(() -> {
-                    try {
-                        System.out.println("submit get.body");
-                        response.get().body();
-                    } catch (ExecutionException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
+            HttpRequest request = HttpRequest.newBuilder(uri).build();
+            CompletableFuture<HttpResponse<Path>> response = client.sendAsync(request,
+                    responseInfo -> {
+                        HttpHeaders headers = responseInfo.headers();
+                        // try to get Content-Length from header
+                        long contentLength = headers.firstValueAsLong("Content-Length").orElse(-1L);
+                        if (contentLength == -1L) {
+                            // No Content-Length header found, retrieve explicitly
+                            try {
+                                contentLength = getContentLength(client, uri);
+                            } catch (IOException | InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        return new FileSaveDownloadSubscriber(savePath, contentLength,
+                            cancelled);
+                    });
+            futures.add(response);
         }
-        CompletableFuture.allOf(responses.toArray(new CompletableFuture[0])).join();
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         long t2 = System.currentTimeMillis();
         System.out.println("time taken:" + (t2 - t1));
     }
@@ -64,9 +64,12 @@ public class Downloader {
     public static void main(String[] args) {
         List<DownloadSourceDestination> list = List.of(
                 new DownloadSourceDestination(
+//                        "https://florentineeyewear.com.au/",
                         "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
-                        Paths.get("D://downloads/encoder_model.onnx")),
+                        Paths.get("D://downloads/encoder_model.onnx"))
+                ,
                 new DownloadSourceDestination(
+//                        "https://florentineeyewear.com.au/",
                         "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
                         Paths.get("D://downloads/decoder_model.onnx"))
                 );
