@@ -1,4 +1,4 @@
-package sample;
+package com.brainysoftware.downloader;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,19 +10,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Flow;
 
-public class StreamingFileDownloadSubscriber implements HttpResponse.BodySubscriber<Path> {
+public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<Path> {
 
     private final CompletableFuture<Path> result = new CompletableFuture<>();
     private final Path outputPath;
-    private final DownloadListener listener;
 
     private Flow.Subscription subscription;
     private OutputStream outputStream;
     private long bytesDownloaded = 0;
+    
+    private static int no = 2;
 
-    public StreamingFileDownloadSubscriber(Path outputPath, DownloadListener listener) {
+    public FileSaveDownloadSubscriber(Path outputPath) {
         this.outputPath = outputPath;
-        this.listener = listener;
         try {
             this.outputStream = Files.newOutputStream(outputPath,
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
@@ -38,12 +38,14 @@ public class StreamingFileDownloadSubscriber implements HttpResponse.BodySubscri
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
+        System.out.println("onSubscribe");
         this.subscription = subscription;
         subscription.request(1); // request first chunk
     }
 
     @Override
     public void onNext(List<ByteBuffer> items) {
+        System.out.println("onNext----- items.size:" + items.size());
         try {
             for (ByteBuffer buffer : items) {
                 int len = buffer.remaining();
@@ -52,7 +54,8 @@ public class StreamingFileDownloadSubscriber implements HttpResponse.BodySubscri
                 buffer.get(data);
                 outputStream.write(data);
             }
-            listener.onProgress(bytesDownloaded);
+            System.out.println("request again:" + no);
+            //subscription.request(no++); // request next chunk
             subscription.request(1); // request next chunk
         } catch (IOException e) {
             onError(e);
@@ -61,19 +64,22 @@ public class StreamingFileDownloadSubscriber implements HttpResponse.BodySubscri
 
     @Override
     public void onError(Throwable throwable) {
+        System.out.println("onError");
         try {
             outputStream.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+            ignored.printStackTrace();
+            
+        }
         result.completeExceptionally(throwable);
-        listener.onError(throwable);
     }
 
     @Override
     public void onComplete() {
+        System.out.println("onComplete");
         try {
             outputStream.close();
             result.complete(outputPath);
-            listener.onComplete(outputPath);
         } catch (IOException e) {
             onError(e);
         }

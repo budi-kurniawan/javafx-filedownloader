@@ -2,8 +2,6 @@ package com.brainysoftware.downloader.ui;
 
 import java.io.IOException;
 
-import com.brainysoftware.downloader.DownloadStatusDialogResponse;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -11,7 +9,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 
-public class DownloadStatusDialog extends Dialog<DownloadStatusDialogResponse> {
+public class DownloadStatusDialog extends Dialog<String> {
     
     public DownloadStatusDialog(String[] urls) {
         // Set dialog title and header
@@ -36,7 +34,7 @@ public class DownloadStatusDialog extends Dialog<DownloadStatusDialogResponse> {
             // for Cancel button
             setResultConverter(buttonType -> {
                 if (buttonType == ButtonType.OK) {
-                    return new DownloadStatusDialogResponse(new int[] {});
+                    return "OK";
                 }
                 return null;
             });
