@@ -32,45 +32,33 @@ public class MenuController implements Initializable {
 
 	@FXML
     private void handleDownload(final ActionEvent event) {
-	    String[] uris = {
-//              "https://theage.com.au",
-              "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
-              "https://cnn.com",
-//            "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
-	    };
-	    
-	    
         AtomicBoolean cancelled = new AtomicBoolean(false);
-        MultiProgressDialog dialog = new MultiProgressDialog("Download Progress",
-                uris.length);
-        DownloadListener listener = new UIDownloadListener(dialog); // share among downloads
         List<DownloadRequest> downloadRequests = List.of(
                 new DownloadRequest(
                         0,
 //                        "https://theage.com.au",
                         "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
                         Paths.get("D://downloads/encoder_model.onnx"),
-                        cancelled,
-                        listener)
+                        cancelled)
                 ,
                 new DownloadRequest(
                         1,
 //                        "https://cnn.com",
                         "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
                         Paths.get("D://downloads/decoder_model.onnx"),
-                        cancelled,
-                        listener)
+                        cancelled)
                 );
+	    
+	    
+        MultiProgressDialog dialog = new MultiProgressDialog("Download Progress",
+                downloadRequests.size());
+        DownloadListener listener = new UIDownloadListener(dialog); // share among downloads
         dialog.setOnCancel(() -> cancelled.set(true));
         dialog.show();
         
-        long t1 = System.currentTimeMillis();
         Downloader downloader = new Downloader();
+        downloader.setDownloadListener(listener);
         downloader.download(downloadRequests);
-        long t2 = System.currentTimeMillis();
-        System.out.println("time taken:" + (t2 - t1));
-
-
     }
 
 	@FXML

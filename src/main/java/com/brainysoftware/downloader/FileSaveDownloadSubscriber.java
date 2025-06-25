@@ -31,12 +31,13 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
     private DownloadListener downloadListener;
     private int index;
     
-    public FileSaveDownloadSubscriber(long contentLength, DownloadRequest downloadRequest) {
+    public FileSaveDownloadSubscriber(long contentLength, DownloadRequest downloadRequest,
+            DownloadListener downloadListener) {
         this.startTime = LocalDateTime.now();
         this.index = downloadRequest.index();
         this.contentLength = contentLength;
         this.outputPath = downloadRequest.savePath();
-        this.downloadListener = downloadRequest.listener();
+        this.downloadListener = downloadListener;
         this.cancelled = downloadRequest.cancelled();
         try {
             this.fileChannel = FileChannel.open(outputPath,

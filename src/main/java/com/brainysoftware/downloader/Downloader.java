@@ -15,9 +15,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.brainysoftware.downloader.listener.SimpleDownloadListener;
+import com.brainysoftware.downloader.listener.DownloadListener;
 
 public class Downloader {
+    private DownloadListener downloadListener;
+    
     public void download(List<DownloadRequest> downloadRequests) {
         HttpClient client = HttpClient.newBuilder()
                 .followRedirects(Redirect.NORMAL)
@@ -40,11 +42,16 @@ public class Downloader {
                                 e.printStackTrace();
                             }
                         }
-                        return new FileSaveDownloadSubscriber(contentLength, downloadRequest);
+                        return new FileSaveDownloadSubscriber(contentLength, 
+                                downloadRequest, downloadListener);
                     });
             futures.add(future);
         }
         //CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+    }
+    
+    public void setDownloadListener(DownloadListener downloadListener) {
+        this.downloadListener = downloadListener;
     }
     
     private static long getContentLength(HttpClient client, URI uri) throws IOException, InterruptedException {
@@ -65,16 +72,14 @@ public class Downloader {
                         "https://theage.com.au",
 //                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
                         Paths.get("D://downloads/encoder_model.onnx"),
-                        cancelled,
-                        new SimpleDownloadListener())
+                        cancelled)
                 ,
                 new DownloadRequest(
                         1,
                         "https://cnn.com",
 //                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
                         Paths.get("D://downloads/decoder_model.onnx"),
-                        cancelled,
-                        null)
+                        cancelled)
                 );
         long t1 = System.currentTimeMillis();
         Downloader downloader = new Downloader();
