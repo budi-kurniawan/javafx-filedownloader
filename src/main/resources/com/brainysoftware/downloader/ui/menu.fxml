@@ -12,9 +12,6 @@
     <menus>
         <Menu mnemonicParsing="true" text="_File" fx:id="fileMenu">
             <items>
-                <MenuItem text="_New" accelerator="Shortcut+N"/>
-                <MenuItem text="_Open" onAction="#handleOpenDocument" accelerator="Shortcut+O"/>
-                <SeparatorMenuItem/>
                 <MenuItem text="_Download" onAction="#handleDownload" accelerator="Shortcut+D"/>
                 <SeparatorMenuItem/>
                 <MenuItem text="E_xit" accelerator="Shortcut+X" mnemonicParsing="true" onAction="#handleExit"/>

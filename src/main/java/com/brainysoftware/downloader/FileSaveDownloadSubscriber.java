@@ -74,8 +74,8 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
                 fileChannel.write(buffer);
             }
             if (downloadListener != null) {
-                System.out.println("inside subscriber. bytesDl:" + bytesDownloaded + 
-                        ", cL:" + contentLength);
+//                System.out.println("inside subscriber. bytesDl:" + bytesDownloaded + 
+//                        ", cL:" + contentLength);
                 DownloadProgressEvent event = new DownloadProgressEvent(this, bytesDownloaded, contentLength);
                 downloadListener.onProgress(event);
             }

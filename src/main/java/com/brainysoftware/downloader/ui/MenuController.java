@@ -32,17 +32,10 @@ public class MenuController implements Initializable {
 	}
 
 	@FXML
-	private void handleOpenDocument(final ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open PDF Document");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF Files", "*.pdf"));
-	}
-
-	@FXML
     private void handleDownload(final ActionEvent event) {
         AtomicBoolean cancelled = new AtomicBoolean(false);
-        DownloadProgressDialog dialog = new DownloadProgressDialog("Download Progress",
-                "Please wait");
+        MultiProgressDialog dialog = new MultiProgressDialog("Download Progress",
+                1);
         List<DownloadRequest> downloadRequests = List.of(
                 new DownloadRequest(
 //                        "https://theage.com.au",
@@ -59,11 +52,13 @@ public class MenuController implements Initializable {
 //                        null)
                 );
         dialog.setOnCancel(() -> {
-            System.out.println("cancelled by clicking Cancel");
-            dialog.close();
+            //dialog.hide();
+            System.out.println("set cancelled to true");
             cancelled.set(true);
         });
         dialog.show();
+
+        
         long t1 = System.currentTimeMillis();
         Downloader downloader = new Downloader();
         downloader.download(downloadRequests);

@@ -15,9 +15,6 @@
     <top>
         <VBox>
             <fx:include fx:id="menuBar" source="menu.fxml"/>
-<!--
-            <fx:include fx:id="toolBar" source="toolbar.fxml"/>
--->
         </VBox>
     </top>
     <center>

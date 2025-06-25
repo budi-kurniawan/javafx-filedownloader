@@ -3,8 +3,6 @@ package com.brainysoftware.downloader.ui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.brainysoftware.downloader.event.EventManager;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -20,9 +18,6 @@ import javafx.scene.layout.VBox;
  */
 public class MainController implements Initializable {
     
-    public static final String TOOLBAR_GROUP_TABLE = "tablesToolBarGroup";
-    public static final String TOOLBAR_GROUP_SQL = "sqlToolBarGroup";
-
     @FXML private MenuBar menuBar;
     @FXML private ToolBar toolBar;
     @FXML private Label label;
@@ -31,12 +26,6 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         System.out.println("Initialize MainController...");
-
-        EventManager em = EventManager.getInstance();
-//        em.registerDocumentOpenedListener(new DocumentOpenedListener());
-//        em.registerImageAddedListener(new ImageAddedListener());
-//        em.registerPageSelectedListener(new PageSelectedListener());
-//        em.registerPageRotatedListener(new PageRotatedListener());
     }
     
     @FXML

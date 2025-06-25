@@ -6,8 +6,8 @@ import com.brainysoftware.downloader.event.DownloadProgressEvent;
 import com.brainysoftware.downloader.listener.DownloadListener;
 
 public class UIDownloadListener implements DownloadListener {
-    private DownloadProgressDialog dialog;
-    public UIDownloadListener(DownloadProgressDialog dialog) {
+    private MultiProgressDialog dialog;
+    public UIDownloadListener(MultiProgressDialog dialog) {
         this.dialog = dialog;
     }
 
@@ -15,8 +15,8 @@ public class UIDownloadListener implements DownloadListener {
     public void onProgress(DownloadProgressEvent event) {
         // TODO Auto-generated method stub
         double progress = (double) event.getBytesDownloaded() / event.getContentLength();
-        System.out.println("progress:" + progress);
-        dialog.setProgress(progress);
+        //System.out.println("progress:" + progress);
+        dialog.setProgress(0, progress);
     }
 
     @Override
