@@ -7,13 +7,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.brainysoftware.downloader.DownloadRequest;
 import com.brainysoftware.downloader.Downloader;
+import com.brainysoftware.downloader.listener.DownloadListener;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.MenuBar;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * 
@@ -33,31 +32,37 @@ public class MenuController implements Initializable {
 
 	@FXML
     private void handleDownload(final ActionEvent event) {
+	    String[] uris = {
+//              "https://theage.com.au",
+              "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
+              "https://cnn.com",
+//            "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
+	    };
+	    
+	    
         AtomicBoolean cancelled = new AtomicBoolean(false);
         MultiProgressDialog dialog = new MultiProgressDialog("Download Progress",
-                1);
+                uris.length);
+        DownloadListener listener = new UIDownloadListener(dialog); // share among downloads
         List<DownloadRequest> downloadRequests = List.of(
                 new DownloadRequest(
+                        0,
 //                        "https://theage.com.au",
                         "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
                         Paths.get("D://downloads/encoder_model.onnx"),
                         cancelled,
-                        new UIDownloadListener(dialog))
-//                ,
-//                new DownloadRequest(
+                        listener)
+                ,
+                new DownloadRequest(
+                        1,
 //                        "https://cnn.com",
-////                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
-//                        Paths.get("D://downloads/decoder_model.onnx"),
-//                        cancelled,
-//                        null)
+                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
+                        Paths.get("D://downloads/decoder_model.onnx"),
+                        cancelled,
+                        listener)
                 );
-        dialog.setOnCancel(() -> {
-            //dialog.hide();
-            System.out.println("set cancelled to true");
-            cancelled.set(true);
-        });
+        dialog.setOnCancel(() -> cancelled.set(true));
         dialog.show();
-
         
         long t1 = System.currentTimeMillis();
         Downloader downloader = new Downloader();

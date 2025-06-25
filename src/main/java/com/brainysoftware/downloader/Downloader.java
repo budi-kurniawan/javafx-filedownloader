@@ -61,6 +61,7 @@ public class Downloader {
         AtomicBoolean cancelled = new AtomicBoolean(false);
         List<DownloadRequest> downloadRequests = List.of(
                 new DownloadRequest(
+                        0,
                         "https://theage.com.au",
 //                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
                         Paths.get("D://downloads/encoder_model.onnx"),
@@ -68,6 +69,7 @@ public class Downloader {
                         new SimpleDownloadListener())
                 ,
                 new DownloadRequest(
+                        1,
                         "https://cnn.com",
 //                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
                         Paths.get("D://downloads/decoder_model.onnx"),
