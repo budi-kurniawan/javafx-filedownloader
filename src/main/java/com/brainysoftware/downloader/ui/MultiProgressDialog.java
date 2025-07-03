@@ -8,6 +8,7 @@ import com.brainysoftware.downloader.DownloadRequest;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -93,13 +94,11 @@ public class MultiProgressDialog {
             Platform.runLater(() -> progressBars.get(index).setStyle("-fx-accent:green"));
             for (int i = 0; i < count; i++) {
                 if (!complete[i]) {
-                    System.out.println("complete one");
                     return;
                 }
             }
-            GUIManager guiManager = GUIManager.getInstance();
             Platform.runLater(() -> {
-                guiManager.showMessageDialog("Message", "File downloads complete");
+                showMessageDialog("Download Status", "File download(s) complete", "");
                 Platform.runLater(stage::hide);
             });
         }
@@ -108,4 +107,13 @@ public class MultiProgressDialog {
     public void setOnCancel(Runnable onCancel) {
         this.onCancel = onCancel;
     }
+    
+    public void showMessageDialog(String title, String header, String content) {
+        Alert errorAlert = new Alert(Alert.AlertType.INFORMATION);
+        errorAlert.setTitle(title);
+        errorAlert.setHeaderText(header);
+        errorAlert.setContentText(content);
+        errorAlert.showAndWait();
+    }
+
 }

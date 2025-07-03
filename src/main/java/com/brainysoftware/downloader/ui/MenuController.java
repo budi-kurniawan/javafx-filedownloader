@@ -12,6 +12,7 @@ import com.brainysoftware.downloader.listener.DownloadListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuBar;
 
 /**
@@ -27,7 +28,11 @@ public class MenuController implements Initializable {
 
 	@FXML
 	private void handleAboutAction(final ActionEvent event) {
-		GUIManager.getInstance().showMessageDialog("Downloader 0.1", "Author: Budi Kurniawan (https://brainysoftware.com)");
+        Alert errorAlert = new Alert(Alert.AlertType.INFORMATION);
+        errorAlert.setTitle("About this software");
+        errorAlert.setHeaderText("Downloader 0.1");
+        errorAlert.setContentText("Author: Budi Kurniawan (https://brainysoftware.com)");
+        errorAlert.showAndWait();
 	}
 
 	@FXML
@@ -36,8 +41,8 @@ public class MenuController implements Initializable {
         List<DownloadRequest> downloadRequests = List.of(
                 new DownloadRequest(
                         0,
-//                        "https://theage.com.au",
-                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
+                        "https://theage.com.au",
+//                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/encoder_model.onnx?download=true", 
                         Paths.get("D://downloads/encoder_model.onnx"),
                         cancelled)
                 ,
