@@ -62,7 +62,11 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
     @Override
     public void onNext(List<ByteBuffer> items) {
         if (cancelled.get()) {
-            onComplete();
+            try {
+                fileChannel.close();
+            } catch (IOException e) {
+                onError(e);
+            }
             try {
                 Files.delete(outputPath);
             } catch (IOException e) {
@@ -110,6 +114,8 @@ public class FileSaveDownloadSubscriber implements HttpResponse.BodySubscriber<P
         System.out.println("download of " + this.outputPath.toString());
         System.out.println("start " + startTime);
         System.out.println("finish " + finishTime);
+        this.downloadListener.onComplete(this.index, this.outputPath);
     }
+    
     
 }

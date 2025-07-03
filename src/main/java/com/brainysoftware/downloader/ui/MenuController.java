@@ -43,15 +43,22 @@ public class MenuController implements Initializable {
                 ,
                 new DownloadRequest(
                         1,
-//                        "https://cnn.com",
-                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
+                        "https://cnn.com",
+//                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/decoder_model.onnx?download=true", 
                         Paths.get("D://downloads/decoder_model.onnx"),
+                        cancelled),
+                new DownloadRequest(
+                        2,
+                        "https://huggingface.co/budi2020/bart-large-cnn-onnx/resolve/main/tokenizer.json?download=true", 
+                        Paths.get("D://downloads/tokenizer.json"),
                         cancelled)
                 );
+        
+        
 	    
 	    
         MultiProgressDialog dialog = new MultiProgressDialog("Download Progress",
-                downloadRequests.size());
+                downloadRequests);
         DownloadListener listener = new UIDownloadListener(dialog); // share among downloads
         dialog.setOnCancel(() -> cancelled.set(true));
         dialog.show();

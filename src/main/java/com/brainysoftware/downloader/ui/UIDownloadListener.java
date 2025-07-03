@@ -18,10 +18,13 @@ public class UIDownloadListener implements DownloadListener {
     }
 
     @Override
-    public void onComplete(Path path) {
+    public void onComplete(int index, Path path) {
+        System.out.println("complete:" + path.toString());
+        this.dialog.setComplete(index);
     }
 
     @Override
     public void onError(Throwable error) {
+        System.out.println("onError:" + error.toString());
     }
 }

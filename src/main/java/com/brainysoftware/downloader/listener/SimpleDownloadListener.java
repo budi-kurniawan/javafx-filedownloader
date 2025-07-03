@@ -13,7 +13,7 @@ public class SimpleDownloadListener implements DownloadListener {
     }
 
     @Override
-    public void onComplete(Path path) {
+    public void onComplete(int index, Path path) {
         // TODO Auto-generated method stub
         
     }

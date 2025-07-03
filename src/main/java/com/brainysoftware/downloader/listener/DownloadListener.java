@@ -6,6 +6,6 @@ import com.brainysoftware.downloader.event.DownloadProgressEvent;
 
 public interface DownloadListener {
     void onProgress(DownloadProgressEvent event);
-    void onComplete(Path path);
+    void onComplete(int index, Path path);
     void onError(Throwable error);
 }
