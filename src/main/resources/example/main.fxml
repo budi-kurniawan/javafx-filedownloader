@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import java.lang.*?>
+<?import javafx.scene.*?> 
+<?import javafx.scene.control.*?> 
+<?import javafx.scene.layout.*?> 
+<?import javafx.geometry.Insets?> 
+<?import javafx.scene.image.Image?> 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.collections.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+        fx:controller="example.MainController"
+        prefWidth="600" prefHeight="400">
+    <top>
+        <VBox>
+            <fx:include fx:id="menuBar" source="menu.fxml"/>
+        </VBox>
+    </top>
+    <center>
+    </center> 
+</BorderPane>
