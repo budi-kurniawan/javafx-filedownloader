@@ -18,7 +18,7 @@ public class Main extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
         stage.setTitle("File Downloader - BrainySoftware.com");
-        stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/image/icon.png")));
+        stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/example/icon.png")));
         stage.setScene(scene);
         stage.show();
     }
