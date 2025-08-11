@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?> 
+<?import javafx.scene.layout.*?> 
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" prefWidth="600" prefHeight="400"
+		fx:controller="example.MainController">
+    <top>
+        <VBox>
+			<MenuBar xmlns:fx="http://javafx.com/fxml" fx:id="menuBar">
+			    <menus>
+			        <Menu mnemonicParsing="true" text="_File" fx:id="fileMenu">
+			            <items>
+			                <MenuItem text="_Download" onAction="#handleDownload" accelerator="Shortcut+D"/>
+			                <SeparatorMenuItem/>
+			                <MenuItem text="E_xit" accelerator="Shortcut+X" mnemonicParsing="true" onAction="#handleExit"/>
+			            </items>
+			        </Menu>
+			        <Menu mnemonicParsing="true" text="_Help" fx:id="helpMenu">
+			            <items>
+			                <MenuItem text="About" onAction="#handleAboutAction"/>
+			            </items>
+			        </Menu>
+			    </menus>
+			</MenuBar>
+        </VBox>
+    </top>
+</BorderPane>
